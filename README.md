@@ -1,5 +1,7 @@
 # SourceBans Sync
-SourceBans Sync is a one-way sync from your XenForo installation to your SourceBans++ installation. You will be able to select your XenForo usergroups and match them with your SourceBan++ equivalents. Please read the warnings below before installing this add-on. 
+SourceBans Sync is a one-way sync from your XenForo installation to your SourceBans++ installation. You will be able to select your XenForo usergroups and match them with your SourceBan++ equivalents. Please read the warnings below before installing this add-on.
+
+**Note: This addon will WIPE your current admins in SourceBans. This addon is meant for CLEAN installs. If you don't want to lose all your current admins and their associations to previous bans, then DO NOT USE THIS ADDON.**
  
 > We are not responsible for any damage this plugin does to your SourceBans database. We HIGHLY recommend you backup your database and use a clean installation when using this add-on.
 
