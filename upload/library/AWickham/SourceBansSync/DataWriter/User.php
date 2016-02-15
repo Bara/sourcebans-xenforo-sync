@@ -24,13 +24,17 @@ class AWickham_SourceBansSync_DataWriter_User extends XFCP_AWickham_SourceBansSy
 	protected $_currentSteamId;
 	
 	protected function _postDelete() {
-		$identities = $this->_getUserModel()->getIdentities($this->get('user_id'));
+		// $identities = $this->_getUserModel()->getIdentities($this->get('user_id'));
+		$identities = $this->_getUserModel()->getUserAuthenticationObjectByUserId($this->get('user_id'));
+		
+		// create a user model
+		$xfUserModel = XenForo_Model::create('XenForo_Model_User');
 		
 		// delete the user from source bans
-		if ($identities && array_key_exists('Steam', $identities)) 
+		if ($identities && array_key_exists('steam', $identities))
 		{
 			$adminModel = new AWickham_SourceBansSync_Model_SourceBans_Admin();
-			$adminModel->delete($this->get('user_id'), $identities['Steam']);
+			$adminModel->delete($this->get('user_id'), $xfUserModel->toSteamId($identities['steam']['provider_key']));
 			
 			// rehash the sourcebans servers
 			AWickham_SourceBansSync_Model_SourceBans_Rcon::rehash();
@@ -43,26 +47,29 @@ class AWickham_SourceBansSync_DataWriter_User extends XFCP_AWickham_SourceBansSy
 	{
 		parent::_preSave();
 		
+		// create a user model
+		$xfUserModel = XenForo_Model::create('XenForo_Model_User');
+		
 		// get the user's pre-save identities
 		if ($this->_existingData != array())
 		{
-			$this->_identities = $this->_getUserModel()->getIdentities($this->get('user_id'));
+			$this->_identities = $this->_getUserModel()->getUserAuthenticationObjectByUserId($this->get('user_id'));
 			$identities = unserialize($this->get('identities'));
 			
 			// set the current steam id
-			if ($identities && array_key_exists('Steam', $identities))
+			if ($identities && array_key_exists('steam', $identities))
 			{
-				$this->_currentSteamId = $identities['Steam'];
+				$this->_currentSteamId = $xfUserModel->toSteamId($identities['steam']['provider_key']);
 			}
 	
 			// if the steam id changed
-			if ($identities && (array_key_exists('Steam', $this->_identities) && array_key_exists('Steam', $identities) && $this->_identities['Steam'] != $identities['Steam']))
+			if ($identities && (array_key_exists('steam', $this->_identities) && array_key_exists('steam', $identities) && $this->_identities['steam'] != $identities['steam']))
 			{
-				$this->_currentSteamId = $this->_identities['Steam'];
+				$this->_currentSteamId = $xfUserModel->toSteamId($this->_identities['steam']['provider_key']);
 				
 				// see if the Steam ID is already in use
 				$adminModel = new AWickham_SourceBansSync_Model_SourceBans_Admin();
-				if ($adminModel->fetchBySteamId($identities['Steam']))
+				if ($adminModel->fetchBySteamId($xfUserModel->toSteamId($identities['steam']['provider_key'])))
 				{
 					$this->error(new XenForo_Phrase('steam_id_already_in_use'), 'identities');
 				} 			
@@ -77,15 +84,16 @@ class AWickham_SourceBansSync_DataWriter_User extends XFCP_AWickham_SourceBansSy
 		// get the source bans admin model
 		$sbAdminModel = new AWickham_SourceBansSync_Model_SourceBans_Admin();
 		$xfUserModel = XenForo_Model::create('XenForo_Model_User');
+		$xfUserExternalModel = XenForo_Model::create('XenForo_Model_UserExternal');
 
 		// get the user's new identities
 		$identities = unserialize($this->get('identities'));
 		
 		// only do this if the steam id is set
-		if ($identities && array_key_exists('Steam', $identities))
+		if ($identities && array_key_exists('steam', $identities))
 		{
 			// check to see if the user exists in source bans
-			$sbUser = $sbAdminModel->fetchBySteamId($this->_currentSteamId);
+			$sbUser = $sbAdminModel->fetchBySteamId($xfUserModel->toSteamId($this->_currentSteamId));
 			
 			// add the user to source bans
 			if (!$sbUser)
@@ -98,7 +106,7 @@ class AWickham_SourceBansSync_DataWriter_User extends XFCP_AWickham_SourceBansSy
 					$insertValues = array(
 						'user' => $this->get('username'),
 						'email' => $this->get('email'),
-						'authid' => $identities['Steam'],
+						'authid' => $xfUserModel->toSteamId($identities['steam']['provider_key']),
 						'password' => XenForo_Application::generateRandomString(8),
 						'gid' => $gid,
 						'srvgroups_id' => $srvgroups_id,
@@ -116,14 +124,14 @@ class AWickham_SourceBansSync_DataWriter_User extends XFCP_AWickham_SourceBansSy
 			else 
 			{
 				// update the user if anything we care about changed
-				if ($this->isChanged('user_group_id') || $this->isChanged('secondary_group_ids') || $this->isChanged('email') || $this->isChanged('username') || (array_key_exists('Steam', $this->_identities) && $this->_identities['Steam'] != $identities['Steam']))
+				if ($this->isChanged('user_group_id') || $this->isChanged('secondary_group_ids') || $this->isChanged('email') || $this->isChanged('username') || (array_key_exists('steam', $this->_identities) && $this->_identities['steam'] != $identities['steam']))
 				{
 					// figure out the groups
 					list ($gid, $srvgroups_id, $serverGroupId) = $xfUserModel->getSourceBansGroups($this, XenForo_Application::get('options')->AWickham_SourceBansSync_Groups);
 					if (!$gid || !$srvgroups_id || !$serverGroupId)
 					{
 						// remove the user from source bans
-						$sbAdminModel->delete($this->get('user_id'), $this->_currentSteamId);
+						$sbAdminModel->delete($this->get('user_id'), $xfUserModel->toSteamId($this->_currentSteamId));
 					}
 					// update the user, finally
 					else 
@@ -131,12 +139,12 @@ class AWickham_SourceBansSync_DataWriter_User extends XFCP_AWickham_SourceBansSy
 						$updateArray = array(
 							'user' => $this->get('username'),
 							'email' => $this->get('email'),
-							'authid' => $identities['Steam'],
+							'authid' => $xfUserModel->toSteamId($identities['steam']['provider_key']),
 							'gid' => $gid,
 							'srvgroups_id' => $srvgroups_id,
 							'server_group_id' => $serverGroupId
 						);
-						$sbAdminModel->update($this->_currentSteamId, $updateArray);						
+						$sbAdminModel->update($xfUserModel->toSteamId($this->_currentSteamId), $updateArray);						
 					}
 					
 					// rehash the sourcebans servers

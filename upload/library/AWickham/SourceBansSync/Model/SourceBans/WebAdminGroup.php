@@ -28,6 +28,11 @@ class AWickham_SourceBansSync_Model_SourceBans_WebAdminGroup extends AWickham_So
 			'value' => '',
 			'selected' => ''
 		);
+		$userGroups[] = array(
+			'label' => 'No Permissions',
+			'value' => '-1',
+			'selected' => ($selectedGroupId == '-1')
+		);
 		foreach ($this->_getSourceBansWebAdminGroups() as $webAdminGroup)
 		{
 			$userGroups[] = array(

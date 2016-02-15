@@ -51,6 +51,7 @@ class AWickham_SourceBansSync_Model_Group extends XenForo_Model
 		return $this->_getDb()->fetchAll('
 		SELECT user_group_id, title
 		FROM xf_user_group
+		WHERE user_group_id !=1
 		ORDER BY user_group_id
 		');
 	}

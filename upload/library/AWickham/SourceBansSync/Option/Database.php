@@ -67,11 +67,13 @@ class AWickham_SourceBansSync_Option_Database
 				$database['table_prefix'] . '_groups',
 				$database['table_prefix'] . '_log',
 				$database['table_prefix'] . '_mods',
+				$database['table_prefix'] . '_overrides',
 				$database['table_prefix'] . '_protests',
 				$database['table_prefix'] . '_servers',
 				$database['table_prefix'] . '_servers_groups',
 				$database['table_prefix'] . '_settings',
 				$database['table_prefix'] . '_srvgroups',
+				$database['table_prefix'] . '_srvgroups_overrides',
 				$database['table_prefix'] . '_submissions'
 			);
 			$query = $db->listTables();

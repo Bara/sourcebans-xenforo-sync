@@ -59,14 +59,42 @@ class AWickham_SourceBansSync_Model_User extends XFCP_AWickham_SourceBansSync_Mo
 		}
 	}
 	
+	
+	// Converts Community ID to Steam ID
+	public function toSteamId($communityId)
+	{
+		if (is_numeric($communityId) && strlen($communityId) >= 16) {
+			$z = bcdiv(bcsub($communityId, '76561197960265728'), '2');
+		} elseif (is_numeric($communityId)) {
+			$z = bcdiv($communityId, '2'); // Actually new User ID format
+		} else {
+			return $communityId; // We have no idea what this is, so just return it.
+		}
+		$y = bcmod($communityId, '2');
+		return 'STEAM_0:' . $y . ':' . floor($z);
+	}
+	
+	// Converts Steam ID to Community ID
+	public function toCommunityId($steamId)
+	{
+		if (preg_match('/^STEAM_/', $steamId)) {
+			$parts = explode(':', $steamId);
+			return bcadd(bcadd(bcmul($parts[2], '2'), '76561197960265728'), $parts[1]);
+		} elseif (is_numeric($steamId) && strlen($id) < 16) {
+			return bcadd($steamId, '76561197960265728');
+		} else {
+			return $steamId; // We have no idea what this is, so just return it.
+		}
+	}
+	
 	public function getUserBySteamId($steamId)
 	{
 		return $this->_getDb()->fetchRow('
 			SELECT *
-			FROM xf_user_identity
-			JOIN xf_user ON xf_user.user_id = xf_user_identity.user_id
-			WHERE identity_service_id = \'Steam\'
-			AND account_name = ?
+			FROM xf_user_external_auth
+			JOIN xf_user ON xf_user.user_id = xf_user_external_auth.user_id
+			WHERE provider = \'steam\'
+			AND provider_key = ?
 		', $steamId);
 	}
 }

@@ -5,7 +5,7 @@
   <admin_style_properties/>
   <admin_templates>
   <template title="AWickham_SourceBansSync_Options_AutoComplete"><![CDATA[<xen:textboxunit label="{$preparedOption.title}" name="{$fieldPrefix}[{$preparedOption.option_id}]" value="{$preparedOption.option_value}"
-hint="{$subOptions.hint}" placeholder="{$subOptions.placeholder}" size="{$subOptions.size}" maxlength="{$subOptions.maxlength}" rows="{$subOptions.rows}" inputclass="{$subOptions.inputclass}" data-acUrl="{$subOptions.data-acUrl}">
+hint="{$subOptions.hint}" placeholder="{$subOptions.placeholder}" size="{$subOptions.size}" maxlength="{$subOptions.maxlength}" rows="{$subOptions.rows}" inputclass="{$subOptions.inputclass} AutoComplete AcSingle" data-acUrl="{$subOptions.data-acUrl}">
 	<xen:explain>{xen:raw $preparedOption.explain}</xen:explain>
 	<xen:html>
 		<xen:include template="option_list_option_editlink" />
@@ -133,7 +133,7 @@ hint="{$preparedOption.hint}">
     <phrase title="AWickham_SourceBansSync_Account" version_id="0" version_string="1.0.0"><![CDATA[SourceBans Account]]></phrase>
     <phrase title="AWickham_SourceBansSync_AccountCreated" version_id="0" version_string="1.0.0"><![CDATA[Your account was created in SourceBans. Your new password is "{password}" (without the quotes).]]></phrase>
     <phrase title="AWickham_SourceBansSync_AccountDeleted" version_id="0" version_string="1.0.0"><![CDATA[Your SourceBans account has been deleted.]]></phrase>
-	<phrase title="AWickham_SourceBansSync_InvalidUsername" version_id="0" version_string="1.0.0"><![CDATA[Invalid Username]]></phrase>
+	<phrase title="AWickham_SourceBansSync_InvalidUsername" version_id="0" version_string="1.0.0"><![CDATA[The username you have selected is not valid. Please make sure you select an appropriate username.]]></phrase>
     <phrase title="option_group_AWickham_SourceBansSync" version_id="0" version_string="1.0.0"><![CDATA[SourceBans Sync]]></phrase>
     <phrase title="option_group_AWickham_SourceBansSync_description" version_id="10" version_string="1.0.0"><![CDATA[Options that allow you to configure your sync between XenForo and SourceBans.]]></phrase>
     <phrase title="option_AWickham_SourceBansSync_BotUser" version_id="0" version_string="1.0.0"><![CDATA[Bot Username]]></phrase>
