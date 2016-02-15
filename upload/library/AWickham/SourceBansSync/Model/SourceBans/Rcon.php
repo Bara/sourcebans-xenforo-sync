@@ -31,7 +31,7 @@ class AWickham_SourceBansSync_Model_SourceBans_Rcon {
 				{
 					continue;
 				}
-				@$rcon->rconCommand("sm_rehash");
+				@$rcon->rconCommand("sm_reloadadmins");
 				unset($rcon);
 			}
 		}		
