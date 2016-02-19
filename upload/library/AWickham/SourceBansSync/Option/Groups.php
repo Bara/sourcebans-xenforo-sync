@@ -47,13 +47,9 @@ class AWickham_SourceBansSync_Option_Groups
 			return true;
 		}
 		
-		if (is_array($groups) && array_key_exists(0, $groups)) {
-			unset($groups[0]);
-		}
-		
 		foreach ($groups as $groupId => $selectedGroups) {
 			if (!is_array($selectedGroups)) {
-				$dw->error(new XenForo_Phrase('sourcebans_group_association_invalid'));
+				unset($groups[$groupId]);
 			} else {
 				if ($selectedGroups['web_admin_group_id'] == '' || $selectedGroups['server_admin_group_id'] == '' || $selectedGroups['server_group_id'] == '') {
 					$dw->error(new XenForo_Phrase('sourcebans_group_association_invalid'));
